@@ -22,4 +22,11 @@ public class Pinyin {
             System.out.println(translation);
         }
     }
+    @Override
+    public String toString() {
+        return "Pinyin{" +
+                "pinyin='" + pinyin + '\'' +
+                ", translations=" + translations +
+                '}';
+    }
 }

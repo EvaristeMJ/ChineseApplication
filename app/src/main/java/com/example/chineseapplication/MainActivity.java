@@ -7,11 +7,13 @@ import android.speech.tts.TextToSpeech;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chineseapplication.pinyin.DatabaseHelper;
 import com.example.chineseapplication.pinyin.PhoneticPinyin;
 import com.example.chineseapplication.pinyin.Pinyin;
 import com.example.chineseapplication.pinyin.PinyinSearch;
 import com.example.chineseapplication.pinyin.PinyinUtil;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -25,11 +27,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView scoreTextView;
     private TextView informationTextView;
     private static int score = 0;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        showToast("TEST");
         setContentView(R.layout.activity_main);
         pinyin = PinyinUtil.createRandomPhoneticPinyin();
         trueButton = findViewById(R.id.trueButton);
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         scoreTextView = findViewById(R.id.scoreText);
         informationTextView = findViewById(R.id.informationText);
         informationTextView.setText("Is this a valid pinyin ?");
+        db = FirebaseFirestore.getInstance();
         setListeners();
     }
     private void onCorrect(){
@@ -97,14 +100,28 @@ public class MainActivity extends AppCompatActivity {
         trueButton.setVisibility(MaterialButton.INVISIBLE);
         nextButton.setEnabled(true);
         nextButton.setVisibility(MaterialButton.VISIBLE);
-        if(pinyin.isValid()) {
-            PinyinSearch search = new PinyinSearch(pinyin.toString(),3);
-            ArrayList<Pinyin> pinyinList = search.getWords();
-            String text = "";
-            for (Pinyin pinyin : pinyinList) {
-                text += pinyin.getPinyin() + " : " + pinyin.getTranslation()[0] + pinyin.getTranslation()[1] + "\n";
-            }
-            informationTextView.setText(text);
+        informationTextView.setText("");
+        if(pinyin.isValid()){
+
+
+            db.collection("PinyinExamples").document(pinyin.getPinyin()).collection("examples").get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    String text = "";
+                    for(com.google.firebase.firestore.QueryDocumentSnapshot document : task.getResult()){
+                        String pinyin1 = document.getString("pinyin");
+                        System.out.println(pinyin1);
+                        String translation = document.getString("translation");
+                        System.out.println(translation);
+                        String[] translations = {translation};
+                        text += pinyin1 + " : " + translation + "\n";
+                        System.out.println(pinyin1 + " : " + translation);
+                    }
+                    informationTextView.setText(text);
+                }
+                else{
+                    System.out.println("Error getting documents: " + task.getException());
+                }
+            });
         }
         else {
             informationTextView.setText("Valid pinyin for this initial :\n");
