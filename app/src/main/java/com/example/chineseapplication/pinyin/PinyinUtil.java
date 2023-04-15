@@ -1,5 +1,7 @@
 package com.example.chineseapplication.pinyin;
 
+import java.util.ArrayList;
+
 public class PinyinUtil {
     /**
      * The list of initials in pinyin system.
@@ -276,5 +278,19 @@ public class PinyinUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * Get the valid pinyin list for the given initial
+     * @param initial
+     * @return the array of valid pinyin
+     */
+    public static String[] getValidPinyinForInitial(String initial) {
+        for(int i = 0; i < initials.length; i++){
+            if(initials[i].equals(initial)){
+                return phoneticPinyinValid[i];
+            }
+        }
+        return null;
     }
 }
