@@ -8,6 +8,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chineseapplication.pinyin.PhoneticPinyin;
+import com.example.chineseapplication.pinyin.Pinyin;
+import com.example.chineseapplication.pinyin.PinyinSearch;
 import com.example.chineseapplication.pinyin.PinyinUtil;
 import com.google.android.material.button.MaterialButton;
 
@@ -95,8 +97,15 @@ public class MainActivity extends AppCompatActivity {
         trueButton.setVisibility(MaterialButton.INVISIBLE);
         nextButton.setEnabled(true);
         nextButton.setVisibility(MaterialButton.VISIBLE);
-        if(pinyin.isValid())
-            informationTextView.setText("Example : TODO add research to find example" );
+        if(pinyin.isValid()) {
+            PinyinSearch search = new PinyinSearch(pinyin.toString(),3);
+            ArrayList<Pinyin> pinyinList = search.getWords();
+            String text = "";
+            for (Pinyin pinyin : pinyinList) {
+                text += pinyin.getPinyin() + " : " + pinyin.getTranslation()[0] + pinyin.getTranslation()[1] + "\n";
+            }
+            informationTextView.setText(text);
+        }
         else {
             informationTextView.setText("Valid pinyin for this initial :\n");
             String[] validPinyin = PinyinUtil.getValidPinyinForInitial(pinyin.getInitialPinyin());

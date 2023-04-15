@@ -12,7 +12,9 @@ import java.util.ArrayList;
 public class PinyinSearch {
     private String url = "https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=0&wdqb=";
     private HttpURLConnection connection;
-    public PinyinSearch(String pinyin){
+    private int nPinyin;
+    public PinyinSearch(String pinyin,int nPinyin){
+        this.nPinyin = nPinyin;
         try {
             String getQuery = "p%3A*" + pinyin + "*";
             connection = (HttpURLConnection) new URL(this.url + getQuery).openConnection();
@@ -22,6 +24,7 @@ public class PinyinSearch {
             e.printStackTrace();
         }
     }
+    // get the words from the website (Really ugly code but it works)
     public ArrayList<Pinyin> getWords(){
         ArrayList<Pinyin> words = new ArrayList<>();
         String content = "";
